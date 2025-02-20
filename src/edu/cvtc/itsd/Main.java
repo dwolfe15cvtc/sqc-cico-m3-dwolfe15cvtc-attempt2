@@ -120,55 +120,65 @@ public class Main {
   // Lookup a card number, toggle the status, and log the new status //////////
   private static void processCard() {
     if (db == null) {
-      showError(ERROR_NO_DB);
-      return;
+        showError(ERROR_NO_DB);
+        return;
     }
 
     ResultSet rows = null;
     try {
-      statementQueryCard.setString(1, fieldNumber.getText());
-      rows = statementQueryCard.executeQuery();
-      if (rows.next()) {
-        int id = rows.getInt("id");
-        String name = rows.getString("name");
-        int currentState = rows.getInt("is_checked_in");
-        currentState = (currentState + 1) % 2;
+        statementQueryCard.setString(1, fieldNumber.getText());
+        rows = statementQueryCard.executeQuery();
+        if (rows.next()) {
+            int id = rows.getInt("id");
+            String name = rows.getString("name");
+            int currentState = rows.getInt("is_checked_in");
+            currentState = (currentState + 1) % 2;
 
-        statementUpdateMember.setInt(1, currentState);
-        statementUpdateMember.setInt(2, id);
-        int numChanged = statementUpdateMember.executeUpdate();
-        if (numChanged != 1) {
-          showError(ERROR_UPDATE_FAILED);
-          return;
+            // Update member's check-in status
+            statementUpdateMember.setInt(1, currentState);
+            statementUpdateMember.setInt(2, id);
+            int numChanged = statementUpdateMember.executeUpdate();
+            if (numChanged != 1) {
+                showError(ERROR_UPDATE_FAILED);
+                return;
+            }
+
+            // Log the status change
+            statementUpdateLog.setInt(1, id);
+            statementUpdateLog.setInt(2, currentState);
+            int numInserted = statementUpdateLog.executeUpdate();
+            if (numInserted != 1) {
+                showError(ERROR_INSERT_FAILED);
+            }
+
+            // Update the status label with the current state (checked in or out)
+            if (currentState == 1) {
+                labelState.setText("Checked in");
+            } else {
+                labelState.setText("Checked out");
+            }
+
+            // Show the state panel
+            scheduleTransitionFrom(CARD_STATE, null);
         }
-
-        statementUpdateLog.setInt(1, id);
-        statementUpdateLog.setInt(2, currentState);
-        int numInserted = statementUpdateLog.executeUpdate();
-        if (numInserted != 1) {
-          showError(ERROR_INSERT_FAILED);
+        else {
+            showError(ERROR_NOT_FOUND);
         }
-
-        scheduleTransitionFrom(CARD_STATE, null);
-      }
-      else {
-        showError(ERROR_NOT_FOUND);
-      }
     }
     catch (SQLException e) {
-      System.err.println(e.getMessage());
-      showError(ERROR_UNKNOWN);
+        System.err.println(e.getMessage());
+        showError(ERROR_UNKNOWN);
     }
     finally {
-      try {
-        if (rows != null) rows.close();
-      }
-      catch (SQLException e2) {
-        System.err.println(e2.getMessage());
-        showError(ERROR_UNKNOWN);
-      }
+        try {
+            if (rows != null) rows.close();
+        }
+        catch (SQLException e2) {
+            System.err.println(e2.getMessage());
+            showError(ERROR_UNKNOWN);
+        }
     }
-  }
+}
 
   // Display errors to users //////////////////////////////////////////////////
   private static void showError(int code) {
