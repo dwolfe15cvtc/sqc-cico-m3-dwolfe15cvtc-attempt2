@@ -1,42 +1,56 @@
-Use `./build.sh` to build CiCo and `./run.sh` to run it if using the command line. You can otherwise use your IDE to build and run CiCo.
+Manual Tests for Ticket 301 - Check-in/Check-out Process:
+Test Case 1: Update Button with Valid Card
 
-# Module 2: Sample test for the happy path. 
+Steps:
 
-## Test steps
-1. Build and run CiCo.
-2. Enter 00000000 into the field and click Update.
-3. Wait 11 seconds.
+    Launch the application.
+    Enter a valid card number (e.g., "00000000") in the card number field.
+    Click the "Update" button.
 
-## Expected results:
-* The status panel should appear after step 2.
-* The main panel should appear after step 3.
+Expected Behavior:
 
-# Module 2: Sample test for invalid card numbers.
+    The application should query the database for the entered card number.
+    The user's name (e.g., "Developer") should appear on the "State" panel.
+    The check-in status should toggle. If the user was previously checked out, the display should show "Checked in". If the user was checked in, the display should show "Checked out".
+    The correct state should be displayed on the panel (e.g., "Checked in" or "Checked out").
 
-## Test steps
-1. Build and run CiCo.
-2. Enter 99999999 into the field and click Update.
-3. Wait 11 seconds.
+Test Case 2: Update Button with Invalid Card
 
-## Expected results:
-* The error panel should appear after step 2.
-* The main panel should appear after step 3.
+Steps:
 
-# Module 2: Help users recognize, diagnose, and recover from errors
+    Launch the application.
+    Enter an invalid card number (e.g., "99999999") in the card number field.
+    Click the "Update" button.
 
-## Test steps
-1. Build and run CiCo.
-2. Enter 99999999 into the field and click Update.
+Expected Behavior:
 
-## Expected results
-* The panel should display "Please show your card to staff to validate." after step 2.
+    The application should display an error message saying: "Please show your card to staff to validate."
+    No changes should be made to the user’s check-in status.
 
-# Module 2: Help and documentation
+Test Case 3: Check-in State Transition
 
-## Test steps
-1. Build and run CiCo.
+Steps:
 
-## Expected results
-* The version number should be displayed after "CiCo" at the bottom.
+    Launch the application.
+    Enter a valid card number (e.g., "00000000") for a user who is initially checked out.
+    Click the "Update" button.
 
+Expected Behavior:
 
+    The user should be marked as "Checked in".
+    The "State" panel should show "Checked in".
+    The system should reflect the correct state transition.
+
+Test Case 4: Check-out State Transition
+
+Steps:
+
+    Launch the application.
+    Enter a valid card number (e.g., "00000000") for a user who is initially checked in.
+    Click the "Update" button.
+
+Expected Behavior:
+
+    The user should be marked as "Checked out".
+    The "State" panel should show "Checked out".
+    The system should reflect the correct state transition.
